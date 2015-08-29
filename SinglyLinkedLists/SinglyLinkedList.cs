@@ -233,8 +233,22 @@ namespace SinglyLinkedLists
 
         public bool IsSorted()
         {
-            throw new NotImplementedException();
+            if (this.first_node == null || this.Count() == 1)
+            {
+                return true;
+            }
+            var node = first_node;
+            var nextNode = node.Next;
+            while (node < nextNode || node.Value == nextNode.Value)
+            {
+                node = node.Next;
+                nextNode = nextNode.Next;
+                if (nextNode == null)
+                    return true; 
+            }
+            return false;
         }
+
 
         // HINT 1: You can extract this functionality (finding the last item in the list) from a method you've already written!
         // HINT 2: I suggest writing a private helper method LastNode()
