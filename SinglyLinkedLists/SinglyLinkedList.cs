@@ -16,24 +16,123 @@ namespace SinglyLinkedLists
         // READ: http://msdn.microsoft.com/en-us/library/aa691335(v=vs.71).aspx
         public SinglyLinkedList(params object[] values)
         {
-            throw new NotImplementedException();
+
+            //if they try and pass in an empty list, throw an error
+            //an empty contructor will still work, but this avoids trying to assign a node the value of null
+            if (values.Count() == 0)
+            {
+                throw new ArgumentException();
+            }
+
+            //for each of the values being passed in, add it to the list. (Use AddLast to guarantee the correct order)
+            for (var i = 0; i < values.Count(); i++)
+            {
+                //this has to be made into a string because it is passed in as an array of objects
+                this.AddLast(values[i].ToString());
+            }
         }
 
         // READ: http://msdn.microsoft.com/en-us/library/6x16t2tx.aspx
         public string this[int i]
         {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
+            //uses the ElementAt function to get value (saves you from duplicating your code)
+            get { return this.ElementAt(i); }
+            set
+            {
+                //using a placeholder list helps save the values in order without having to do voodoo with the pointers
+                var placeholderList = new SinglyLinkedList();
+                for (var q = 0; q < this.Count(); q++)
+                {
+                    //if this is the place where you need to exchange the value, insert it here
+                    if (q == i)
+                    {
+                        placeholderList.AddLast(value);
+                    }
+                    //otherwise, insert the value that was preexisting in the list
+                    else
+                    {
+                        placeholderList.AddLast(this.ElementAt(q));
+                    }
+                }
+
+                //now swap out the values in the placeholder list into the real list.
+                //first swap the first value to clear out the old list
+                first_node = new SinglyLinkedListNode(placeholderList.First());
+                //then loop through the placeholder list and add the values to the real list in order
+                for (var w = 1; w < placeholderList.Count(); w++)
+                {
+                    this.AddLast(placeholderList.ElementAt(w));
+                }
+            }
         }
 
         public void AddAfter(string existingValue, string value)
         {
-            throw new NotImplementedException();
+            //Create an int to store the place in line of the newValue
+            int testForValue = -1;
+
+            //find the existing value in the linked list and assign the place in testForValue
+            for (var i = 0; i < this.Count(); i++)
+            {
+                if (this.ElementAt(i) == existingValue)
+                {
+                    testForValue = i;
+                    break;
+                }
+            }
+
+            //if the existing value isn't in the linked list (if it remains a -1 after the if statement), throw an error 
+            if (testForValue < 0)
+            {
+                throw new ArgumentException();
+            }
+
+            //use a placeholder linked list to store the nodes in the correct order
+            var placeholderList = new SinglyLinkedList();
+
+            //loop through the current linked list and assign each of the values to the placeholder list
+            //and insert the new value in its proper place
+            for (var q = 0; q < this.Count(); q++)
+            {
+                //add each value to the placeholder list
+                placeholderList.AddLast(this.ElementAt(q));
+                //if this spot is the spot where you need to add the new value, add the new value here
+                if (q == testForValue)
+                {
+                    placeholderList.AddLast(value);
+                }
+            }
+            //now reassign the values to the current linked list in order (this.First() etc)
+            first_node = new SinglyLinkedListNode(placeholderList.First());
+            for (var w = 1; w < placeholderList.Count(); w++)
+            {
+                this.AddLast(placeholderList.ElementAt(w));
+            }
         }
 
         public void AddFirst(string value)
         {
-            throw new NotImplementedException();
+            //if this is the first node, this is just an assignment
+            if (this.First() == null)
+            {
+                first_node = new SinglyLinkedListNode(value);
+            }
+            else
+            {
+                //create a placeholder list to store the values in order.
+                var placeholderList = new SinglyLinkedList();
+                placeholderList.AddFirst(value);
+                for (var i = 0; i < this.Count(); i++)
+                {
+                    placeholderList.AddLast(this.ElementAt(i));
+                }
+                //now reassign the values to the current linked list in order (this.First() etc)
+                first_node = new SinglyLinkedListNode(placeholderList.First());
+                for (var q = 1; q < placeholderList.Count(); q++)
+                {
+                    this.AddLast(placeholderList.ElementAt(q));
+                }
+            }
         }
 
         public void AddLast(string value)
@@ -41,9 +140,11 @@ namespace SinglyLinkedLists
             if (this.First() == null)
             {
                 first_node = new SinglyLinkedListNode(value);
-            } else {
+            }
+            else
+            {
                 var node = this.first_node;
-                while(!node.IsLast()) // What's another way to do this????
+                while (!node.IsLast()) // What's another way to do this????
                 {
                     node = node.Next;
                 }
@@ -59,7 +160,8 @@ namespace SinglyLinkedLists
             if (this.First() == null)
             {
                 return 0;
-            } else
+            }
+            else
             {
                 int length = 1;
                 var node = this.first_node;
@@ -81,12 +183,13 @@ namespace SinglyLinkedLists
             if (this.First() == null)
             {
                 throw new ArgumentOutOfRangeException();
-            } else
+            }
+            else
             {
 
                 var node = this.first_node;
-                
-                for(var i = 0;i<=index;i++)
+
+                for (var i = 0; i <= index; i++)
                 {
                     if (i == index)
                     {
@@ -95,7 +198,7 @@ namespace SinglyLinkedLists
                     node = node.Next;
                 }
                 return node.Value;
-                     
+
             }
         }
 
@@ -104,7 +207,8 @@ namespace SinglyLinkedLists
             if (this.first_node == null)
             {
                 return null;
-            } else
+            }
+            else
             {
                 return this.first_node.Value;
             }
@@ -115,7 +219,16 @@ namespace SinglyLinkedLists
 
         public int IndexOf(string value)
         {
-            throw new NotImplementedException();
+            int testForValue = -1;
+            for (var i = 0; i < this.Count(); i++)
+            {
+                if (this.ElementAt(i) == value)
+                {
+                    testForValue = i;
+                    break;
+                }
+            }
+            return testForValue;
         }
 
         public bool IsSorted()
@@ -132,7 +245,8 @@ namespace SinglyLinkedLists
             if (node == null)
             {
                 return null;
-            } else
+            }
+            else
             {
                 // Step 1: Do I need to loop??????
                 // Step 2: IF yes, Do I already have an example of how??? ***
@@ -140,7 +254,7 @@ namespace SinglyLinkedLists
                 // Step 4: Write what I think works.
                 // Step 5: Rebuild/Re-run tests
                 // Step 6: Rinse and repeat
-                while(!node.IsLast())
+                while (!node.IsLast())
                 {
                     node = node.Next;
                 }
@@ -151,8 +265,22 @@ namespace SinglyLinkedLists
 
         public void Remove(string value)
         {
-            throw new NotImplementedException();
+            int number = this.IndexOf(value);
+            var placeholderList = new SinglyLinkedList();
+            for (var i = 0; i < this.Count(); i++)
+            {
+                if (i != number)
+                {
+                    placeholderList.AddLast(this.ElementAt(i));
+                }
+            }
+            first_node = new SinglyLinkedListNode(placeholderList.First());
+            for (var q = 1; q < placeholderList.Count(); q++)
+            {
+                this.AddLast(placeholderList.ElementAt(q));
+            }
         }
+
 
         public void Sort()
         {
@@ -161,33 +289,42 @@ namespace SinglyLinkedLists
 
         public string[] ToArray()
         {
-            throw new NotImplementedException();
-        }
-
-        public override string ToString()
-        {
-            var opening = "{";
-            var ending = "}";
-            var space = " ";
-            var output = "";
-            var quote = "\"";
-            var comma = "," + space;
-            output += opening;
-            var node = this.first_node;
-            if (this.Count() >= 1)
+            string[] Arr = new string[this.Count()];
+            for (int i = 0; i < this.Count(); i++)
             {
-                output += space;
-                while (!node.IsLast())
-                {
-                    output += quote + node.Value + quote + comma;
-                    node = node.Next;
-                }
-                output += quote + this.Last() + quote;
+                Arr[i] = this.ElementAt(i);
             }
-            output += space;
-            output += ending;
-            return output;
+            return Arr;
         }
 
+
+    
+
+
+    public override string ToString()
+    {
+        var opening = "{";
+        var ending = "}";
+        var space = " ";
+        var output = "";
+        var quote = "\"";
+        var comma = "," + space;
+        output += opening;
+        var node = this.first_node;
+        if (this.Count() >= 1)
+        {
+            output += space;
+            while (!node.IsLast())
+            {
+                output += quote + node.Value + quote + comma;
+                node = node.Next;
+            }
+            output += quote + this.Last() + quote;
+        }
+        output += space;
+        output += ending;
+        return output;
     }
+
+}
 }

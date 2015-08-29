@@ -16,8 +16,10 @@ namespace SinglyLinkedLists
         public SinglyLinkedListNode Next
         {
             get { return next; }
-            set {
-                if (value.Equals(this)) {
+            set
+            {
+                if (this == value || value == null)
+                {
                     throw new ArgumentException();
                 }
                 this.next = value;
@@ -26,9 +28,13 @@ namespace SinglyLinkedLists
 
         private string value; // same as this.value
         // Value is a property!! Fix the getter!
-        public string Value 
+        public string Value
         {
             get { return value; }
+            set
+            {
+                this.value = value;
+            }
         }
 
         public static bool operator <(SinglyLinkedListNode node1, SinglyLinkedListNode node2)
@@ -50,7 +56,7 @@ namespace SinglyLinkedLists
 
             // data members default to null, but...
             this.next = null;
-            
+
             // Used by the visualizer:
             allNodes.Add(this);
         }
