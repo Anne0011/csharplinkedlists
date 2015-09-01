@@ -298,7 +298,30 @@ namespace SinglyLinkedLists
 
         public void Sort()
         {
-            throw new NotImplementedException();
+            if (this.Count() < 2)
+            {
+                return;
+            }
+            else
+            {
+                while (!this.IsSorted())
+                {
+                    var node = first_node;
+                    var node2 = node.Next;
+                    for (var i = 1; i < this.Count(); i++)
+                    {
+                        if (node.Value.CompareTo(node.Next.Value) > 0)
+                        {
+                            var temp = node.Next.Value;
+                            node2.Value = node.Value;
+                            node.Value = temp;
+                        }
+                        node = node.Next;
+                        node2 = node2.Next;
+                    }
+                }
+
+            }
         }
 
         public string[] ToArray()
